@@ -1,0 +1,4 @@
+
+cpp.o
+examples/bin
+*.a

@@ -1,0 +1,12 @@
+{
+	"name": "HelloWorld",
+	"targetName" : "HelloWorld",
+	"targetType": "executable",
+	"targetPath": "../bin",
+	"sourcePaths": ["../../src/dirrlicht", "."],
+	"importPaths": ["../../src", "."],
+	
+	"libs": ["Irrlicht"],
+	"lflags" : ["../../cpp.o"],
+	"libs-linux": ["stdc++", "GL", "Xxf86vm", "X11"]
+}
