@@ -1,5 +1,6 @@
 module dirrlicht;
 
+import dirrlicht.core;
 import dirrlicht.gui;
 import dirrlicht.video;
 import dirrlicht.io;
@@ -7,7 +8,51 @@ import dirrlicht.scene;
 
 extern(C++) {
 	extern(C++, irr) {
+		//! An enum for the different device types supported by the Irrlicht Engine.
+		enum E_DEVICE_TYPE
+		{
+			//! A device native to Microsoft Windows
+			/** This device uses the Win32 API and works in all versions of Windows. */
+			EIDT_WIN32,
 
+			//! A device native to Windows CE devices
+			/** This device works on Windows Mobile, Pocket PC and Microsoft SmartPhone devices */
+			EIDT_WINCE,
+
+			//! A device native to Unix style operating systems.
+			/** This device uses the X11 windowing system and works in Linux, Solaris, FreeBSD, OSX and
+			other operating systems which support X11. */
+			EIDT_X11,
+
+			//! A device native to Mac OSX
+			/** This device uses Apple's Cocoa API and works in Mac OSX 10.2 and above. */
+			EIDT_OSX,
+
+			//! A device which uses Simple DirectMedia Layer
+			/** The SDL device works under all platforms supported by SDL but first must be compiled
+			in by defining the IRR_USE_SDL_DEVICE macro in IrrCompileConfig.h */
+			EIDT_SDL,
+
+			//! A device for raw framebuffer access
+			/** Best used with embedded devices and mobile systems.
+			Does not need X11 or other graphical subsystems.
+			May support hw-acceleration via OpenGL-ES for FBDirect */
+			EIDT_FRAMEBUFFER,
+
+			//! A simple text only device supported by all platforms.
+			/** This device allows applications to run from the command line without opening a window.
+			It can render the output of the software drivers to the console as ASCII. It only supports
+			mouse and keyboard in Windows operating systems. */
+			EIDT_CONSOLE,
+
+			//! This selection allows Irrlicht to choose the best device from the ones available.
+			/** If this selection is chosen then Irrlicht will try to use the IrrlichtDevice native
+			to your operating system. If this is unavailable then the X11, SDL and then console device
+			will be tried. This ensures that Irrlicht will run even if your platform is unsupported,
+			although it may not be able to render anything. */
+			EIDT_BEST
+		}
+	
 		enum ELOG_LEVEL
 		{
 			ELL_DEBUG,
@@ -302,7 +347,43 @@ extern(C++) {
 		}
 		
 		interface IEventReceiver {
+			void _destructorDoNotUse();
 			bool OnEvent(const ref SEvent event);
+		}
+		//! Information on a joystick, returned from @ref irr::IrrlichtDevice::activateJoysticks()
+		struct SJoystickInfo
+		{
+			//! The ID of the joystick
+			/** This is an internal Irrlicht index; it does not map directly
+			 * to any particular hardware joystick. It corresponds to the
+			 * irr::SJoystickEvent Joystick ID. */
+			ubyte Joystick;
+
+			//! The name that the joystick uses to identify itself.
+			string Name;
+
+			//! The number of buttons that the joystick has.
+			uint Buttons;
+
+			//! The number of axes that the joystick has, i.e. X, Y, Z, R, U, V.
+			/** Note: with a Linux device, the POV hat (if any) will use two axes. These
+			 *  will be included in this count. */
+			uint Axes;
+
+			//! An indication of whether the joystick has a POV hat.
+			/** A Windows device will identify the presence or absence or the POV hat.  A
+			 *  Linux device cannot, and will always return POV_HAT_UNKNOWN. */
+			enum PovHat
+			{
+				//! A hat is definitely present.
+				POV_HAT_PRESENT,
+
+				//! A hat is definitely not present.
+				POV_HAT_ABSENT,
+
+				//! The presence or absence of a hat cannot be determined.
+				POV_HAT_UNKNOWN
+			}
 		}
 
 		interface ILogger {
@@ -331,10 +412,35 @@ extern(C++) {
 			IOSOperator getOSOperator();
 			ITimer getTimer();
 			IRandomizer getRandomizer() const;
+			void setWindowCaption(const wchar* text);
+			bool isWindowActive() const;
+			bool isWindowFocused() const;
+			bool isWindowMinimized() const;
+			bool isFullscreen() const;
+			ECOLOR_FORMAT getColorFormat() const;
+			void closeDevice();
+			const char* getVersion() const;
 			void setEventReceiver(IEventReceiver receiver);
-			void drop();
+			IEventReceiver* getEventReceiver();
+			bool postEventFromUser(const ref SEvent event);
+			void setInputReceivingSceneManager(ISceneManager sceneManager);
+			void setResizable(bool resize=false);
+			void setWindowSize(const ref dimension2du size);
+			void minimizeWindow();
+			void maximizeWindow();
+			void restoreWindow();
+			position2di getWindowPosition();
+			bool activateJoysticks(ref array!SJoystickInfo joystickInfo);
+			bool setGammaRamp(float red, float green, float blue,
+						float relativebrightness, float relativecontrast);
+			bool getGammaRamp(ref float red, ref float green, ref float blue,
+						ref float brightness, ref float contrast);
+			void setDoubleClickTime(uint timeMs);
+			uint getDoubleClickTime() const;
+			void clearSystemMessages();
+			E_DEVICE_TYPE getType() const;
 		}
 	}
 	
-	IrrlichtDevice createDev();
+	IrrlichtDevice createDev(E_DRIVER_TYPE driverType);
 }

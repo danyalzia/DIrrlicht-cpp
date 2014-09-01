@@ -2,6 +2,6 @@
 
 using namespace irr;
 
-IrrlichtDevice* createDev() {
-    return createDevice(video::EDT_BURNINGSVIDEO, core::dimension2du(800,600), false, false);
+IrrlichtDevice* createDev(video::E_DRIVER_TYPE driverType) {
+    return createDevice(driverType, core::dimension2du(800,600));
 }

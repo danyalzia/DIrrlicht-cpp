@@ -1,4 +1,13 @@
 
-cpp.o
+*.o
+*.obj
 examples/bin
 *.a
+
+#D
+*.swp
+*.build.lnkarg
+*.build.rsp
+
+# Dub
+.dub
