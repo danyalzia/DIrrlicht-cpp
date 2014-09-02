@@ -387,15 +387,79 @@ extern(C++) {
 		}
 
 		interface ILogger {
+			//! Destructor
+			void _destructorDoNotUse();
+
+			ELOG_LEVEL getLogLevel() const;
+			void setLogLevel(ELOG_LEVEL ll);
+			void log(const char* text, ELOG_LEVEL ll=ELOG_LEVEL.ELL_INFORMATION);
+			void log(const char* text, const char* hint, ELOG_LEVEL ll=ELOG_LEVEL.ELL_INFORMATION);
+			void log(const char* text, const wchar* hint, ELOG_LEVEL ll=ELOG_LEVEL.ELL_INFORMATION);
+			void log(const wchar* text, const wchar* hint, ELOG_LEVEL ll=ELOG_LEVEL.ELL_INFORMATION);
+			void log(const wchar* text, ELOG_LEVEL ll=ELOG_LEVEL.ELL_INFORMATION);
 		}
 
 		interface IOSOperator {
+			const string getOperatingSystemVersion() const;
+			const wchar* getOperationSystemVersion() const;
+			void copyToClipboard(const char* text) const;
+			const char* getTextFromClipboard() const;
+			bool getProcessorSpeedMHz(uint* MHz) const;
+			bool getSystemMemory(uint* Total, uint* Avail) const;
 		}
 
 		interface ITimer {
+			uint getRealTime() const;
+
+			enum EWeekday
+			{
+				EWD_SUNDAY=0,
+				EWD_MONDAY,
+				EWD_TUESDAY,
+				EWD_WEDNESDAY,
+				EWD_THURSDAY,
+				EWD_FRIDAY,
+				EWD_SATURDAY
+			}
+
+			struct RealTimeDate
+			{
+				// Hour of the day, from 0 to 23
+				uint Hour;
+				// Minute of the hour, from 0 to 59
+				uint Minute;
+				// Second of the minute, due to extra seconds from 0 to 61
+				uint Second;
+				// Year of the gregorian calender
+				int Year;
+				// Month of the year, from 1 to 12
+				uint Month;
+				// Day of the month, from 1 to 31
+				uint Day;
+				// Weekday for the current day
+				EWeekday Weekday;
+				// Day of the year, from 1 to 366
+				uint Yearday;
+				// Whether daylight saving is on
+				bool IsDST;
+			}
+
+			RealTimeDate getRealTimeAndDate() const;
+			uint getTime() const;
+			void setTime(uint time);
+			void stop();
+			void start();
+			void setSpeed(float speed = 1.0f);
+			float getSpeed() const;
+			bool isStopped() const;
+			void tick();
 		}
 
 		interface IRandomizer {
+			void reset(int value=0x0f0f0f0f);
+			int rand() const;
+			float frand() const;
+			int randMax() const;
 		}
 		
 		interface IrrlichtDevice {
@@ -412,7 +476,9 @@ extern(C++) {
 			IOSOperator getOSOperator();
 			ITimer getTimer();
 			IRandomizer getRandomizer() const;
-			void setWindowCaption(const wchar* text);
+			void setRandomizer(IRandomizer r);
+			IRandomizer createDefaultRandomizer() const;
+			void setWindowCaption(const dchar* text);
 			bool isWindowActive() const;
 			bool isWindowFocused() const;
 			bool isWindowMinimized() const;
@@ -439,6 +505,7 @@ extern(C++) {
 			uint getDoubleClickTime() const;
 			void clearSystemMessages();
 			E_DEVICE_TYPE getType() const;
+			static bool isDriverSupported(E_DRIVER_TYPE driver);
 		}
 	}
 	
